@@ -184,7 +184,7 @@ jobs:
         uses: coverallsapp/github-action@1.1.3
         if: matrix.coverage
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.ACTION_SECRET }}
           flag-name: ${{ matrix.os }}-node-${{ matrix.node }}-db-${{ matrix.database }}
           parallel: true
 
@@ -197,5 +197,5 @@ jobs:
       - name: Coveralls Finished
         uses: coverallsapp/github-action@1.1.3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.ACTION_SECRET }}
           parallel-finished: true
