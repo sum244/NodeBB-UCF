@@ -1,9 +1,7 @@
 
-'use strict';
-
-const db = require('../database');
-const plugins = require('../plugins');
-const posts = require('../posts');
+import db from '../database';
+import plugins from '../plugins';
+import posts from '../posts';
 
 module.exports = function (Topics) {
     const terms = {
