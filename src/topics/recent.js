@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,9 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const db = require('../database');
-const plugins = require('../plugins');
-const posts = require('../posts');
+Object.defineProperty(exports, "__esModule", { value: true });
+const db = require("../database");
+const plugins = require("../plugins");
+const posts = require("../posts");
 module.exports = function (Topics) {
     const terms = {
         day: 86400000,
@@ -36,7 +37,7 @@ module.exports = function (Topics) {
             // uid, start, stop, term
             const tids = yield Topics.getLatestTidsFromSet('topics:recent', options.start, options.stop, options.term);
             const topics = yield Topics.getTopics(tids, options);
-            return { topics: topics, nextStart: options.stop + 1 };
+            return { topics: topics, nextStart: String(parseInt(options.stop, 10) + 1) };
         });
     };
     Topics.getLatestTidsFromSet = function (set, start, stop, term) {
@@ -45,7 +46,10 @@ module.exports = function (Topics) {
             if (terms[term]) {
                 since = terms[term];
             }
-            const count = parseInt(stop, 10) === -1 ? stop : stop - start + 1;
+            const count = parseInt(stop, 10) === -1 ? stop : parseInt(stop, 10) - parseInt(start, 10) + 1;
+            // The next line calls a function in a module that has not been updated to TS yet
+            /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call,
+              @typescript-eslint/no-unsafe-return */
             return yield db.getSortedSetRevRangeByScore(set, start, count, '+inf', Date.now() - since);
         });
     };
@@ -55,10 +59,16 @@ module.exports = function (Topics) {
             if (!pid) {
                 return;
             }
+            // The next line calls a function in a module that has not been updated to TS yet
+            /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call,
+              @typescript-eslint/no-unsafe-assignment */
             const timestamp = yield posts.getPostField(pid, 'timestamp');
             if (!timestamp) {
                 return;
             }
+            // The next line calls a function in a module that has not been updated to TS yet
+            /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call,
+              @typescript-eslint/no-unsafe-argument */
             yield Topics.updateLastPostTime(tid, timestamp);
         });
     };
@@ -66,9 +76,13 @@ module.exports = function (Topics) {
         return __awaiter(this, void 0, void 0, function* () {
             yield Topics.setTopicField(tid, 'lastposttime', lastposttime);
             const topicData = yield Topics.getTopicFields(tid, ['cid', 'deleted', 'pinned']);
+            // The next line calls a function in a module that has not been updated to TS yet
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             yield db.sortedSetAdd(`cid:${topicData.cid}:tids:lastposttime`, lastposttime, tid);
             yield Topics.updateRecent(tid, lastposttime);
             if (!topicData.pinned) {
+                // The next line calls a function in a module that has not been updated to TS yet
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                 yield db.sortedSetAdd(`cid:${topicData.cid}:tids`, lastposttime, tid);
             }
         });
@@ -77,9 +91,15 @@ module.exports = function (Topics) {
         return __awaiter(this, void 0, void 0, function* () {
             let data = { tid: tid, timestamp: timestamp };
             if (plugins.hooks.hasListeners('filter:topics.updateRecent')) {
+                // The next line calls a function in a module that has not been updated to TS yet
+                /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call,
+                   @typescript-eslint/no-unsafe-assignment */
                 data = yield plugins.hooks.fire('filter:topics.updateRecent', { tid: tid, timestamp: timestamp });
             }
             if (data && data.tid && data.timestamp) {
+                // The next line calls a function in a module that has not been updated to TS yet
+                /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call,
+                   @typescript-eslint/no-unsafe-return */
                 yield db.sortedSetAdd('topics:recent', data.timestamp, data.tid);
             }
         });
