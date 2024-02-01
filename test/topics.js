@@ -1005,33 +1005,32 @@ describe('Topic\'s', () => {
             ], done);
         });
 
-        it('should not appear as unread in the recent list', (done) => {
+        it('should not appear as unread in the recent list', () => {
             async.waterfall([
-                function (done) {
-                    topics.ignore(newTid, uid, done);
+                function () {
+                    topics.ignore(newTid, uid);
                 },
-                function (done) {
+                function () {
                     topics.getLatestTopics({
                         uid: uid,
                         start: 0,
                         stop: -1,
                         term: 'year',
-                    }, done);
+                    });
                 },
-                function (results, done) {
+                function (results) {
                     const { topics } = results;
                     let topic;
                     let i;
                     for (i = 0; i < topics.length; i += 1) {
                         if (topics[i].tid === parseInt(newTid, 10)) {
                             assert.equal(false, topics[i].unread, 'ignored topic was marked as unread in recent list');
-                            return done();
+                            return;
                         }
                     }
                     assert.ok(topic, 'topic didn\'t appear in the recent list');
-                    done();
                 },
-            ], done);
+            ]);
         });
 
         it('should appear as unread again when marked as reading', (done) => {
